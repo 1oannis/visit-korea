@@ -1,0 +1,15 @@
+[submodule "visit-korea-site/themes/ananke"]
+	path = visit-korea-site/themes/ananke
+	url = https://github.com/theNewDynamic/gohugo-theme-ananke
+[submodule "visit-korea-site/themes/stack"]
+	path = visit-korea-site/themes/stack
+	url = https://github.com/CaiJimmy/hugo-theme-stack
+[submodule "visit-korea-site/themes/fixit"]
+	path = visit-korea-site/themes/fixit
+	url = https://github.com/hugo-fixit/FixIt
+[submodule "visit-korea-site/themes/niello"]
+	path = visit-korea-site/themes/niello
+	url = https://github.com/guangmean/Niello
+[submodule "visit-korea-site/themes/qubt"]
+	path = visit-korea-site/themes/qubt
+	url = https://github.com/chrede88/qubt

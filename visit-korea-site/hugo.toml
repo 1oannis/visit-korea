@@ -1,0 +1,4 @@
+baseURL = 'http://korea.1oannis.com/'
+languageCode = 'en-us'
+title = 'Visit Korea'
+theme = "qubt"
