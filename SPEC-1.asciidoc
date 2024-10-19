@@ -1,0 +1,331 @@
+= SPEC-1: Visitor Information Webapp for Seoul
+:sectnums:
+:toc:
+
+
+== Background
+
+The goal of this project is to create a simple, modern, and low-maintenance website for sharing useful information with friends who are visiting Seoul, South Korea. The website should provide visitors with categorized recommendations such as navigation, sights, restaurants, and optional places to visit, all presented in a clean and intuitive dashboard. Each place should have a standardized page that includes basic information such as location, description, and optionally a picture.
+
+== Requirements
+
+The project should adhere to the following functional and technical requirements:
+
+* **Must have:**
+  - Clean and modern design
+  - A dashboard with categories such as Navigation, Sights, Restaurants, and Optional to Visit
+  - A standardized card-like page for each item (e.g., restaurant or sight), showing relevant information and optional images
+  - Minimal maintenance with simple ways to update content (Markdown or similar text formats)
+  - Responsiveness to look good on both mobile and desktop devices
+
+* **Should have:**
+  - Basic translation support, possibly for both English and Korean content
+  - Fast load times with minimal complexity
+  - Clear navigation within the dashboard
+  
+* **Could have:**
+  - Simple search functionality across categories
+  - Ability to easily add or remove categories
+
+* **Won't have:**
+  - User accounts or login functionality
+  - Complex content management systems or databases
+= SPEC-1: Visitor Information Webapp for Seoul
+:sectnums:
+:toc:
+
+
+== Background
+
+The goal of this project is to create a simple, modern, and low-maintenance website for sharing useful information with friends who are visiting Seoul, South Korea. The website should provide visitors with categorized recommendations such as navigation, sights, restaurants, and optional places to visit, all presented in a clean and intuitive dashboard. Each place should have a standardized page that includes basic information such as location, description, and optionally a picture.
+
+== Requirements
+
+The project should adhere to the following functional and technical requirements:
+
+* **Must have:**
+  - Clean and modern design
+  - A dashboard with categories such as Navigation, Sights, Restaurants, and Optional to Visit
+  - A standardized card-like page for each item (e.g., restaurant or sight), showing relevant information and optional images
+  - Minimal maintenance with simple ways to update content (Markdown or similar text formats)
+  - Responsiveness to look good on both mobile and desktop devices
+
+* **Should have:**
+  - Basic translation support, possibly for both English and Korean content
+  - Fast load times with minimal complexity
+  - Clear navigation within the dashboard
+  
+* **Could have:**
+  - Simple search functionality across categories
+  - Ability to easily add or remove categories
+
+* **Won't have:**
+  - User accounts or login functionality
+  - Complex content management systems or databases
+
+== Method
+
+=== Architecture Overview
+
+The website will use a Static Site Generator (SSG), such as Hugo or Eleventy, to convert content written in Markdown (.md) into static HTML pages. The content will be structured in categories (Navigation, Sights, Restaurants, Optional to Visit), each represented by a directory containing individual markdown files for each item. The resulting static site will be deployed to a simple, free hosting service such as GitHub Pages or Netlify.
+
+image::architecture.svg[Architecture Diagram]
+
+
+=== File and Content Structure
+
+The website's structure will consist of directories that represent different categories. Each category will contain markdown files with the following fields:
+
+- **Title**: The name of the sight/restaurant
+- **Description**: Brief information or story
+- **Location**: Address or coordinates
+- **Image (Optional)**: Path to an image file
+- **Tags**: Optional tags for easy searching or filtering
+
+An example markdown file for a restaurant:
+
+```yaml
+---
+title: "Myeongdong Kyoja"
+description: "A famous noodle restaurant in Seoul."
+location: "29 Myeongdong 10-gil, Jung-gu, Seoul"
+image: "myeongdong-kyoja.jpg"
+tags: ["restaurant", "noodles"]
+---
+```
+
+These markdown files will be processed by the SSG to automatically generate HTML pages. Each category will have a listing page that aggregates the items into a card-like layout.
+
+=== Styling and Design
+
+A lightweight CSS framework, such as Tailwind CSS, will be used to ensure a clean and modern design without much custom CSS. The framework will be integrated into the SSG build process to allow for responsive, mobile-friendly pages.
+
+Card Layout for each sight/restaurant will include:
+- A title
+- Description
+- Image (if available)
+- Location (with map integration, e.g., Google Maps or Naver Map link)
+
+Sample HTML structure for a card:
+
+```html
+<div class="card">
+  <h2>{{ title }}</h2>
+  <p>{{ description }}</p>
+  <img src="{{ image }}" alt="Image of {{ title }}">
+  <p>Location: {{ location }}</p>
+</div>
+```
+
+=== Deployment and Hosting
+
+The final static website will be hosted on GitHub Pages or Netlify, both of which offer free hosting for static sites and automatic updates when new content is pushed to the repository. The deployment process will be as simple as pushing content to the GitHub repository, which triggers a new build of the site on the hosting platform.
+
+== Method (continued)
+
+=== Deployment to Ubuntu Server
+
+Given that you have an Ubuntu machine with DNS, TLS, and routing handled by Cloudflare, the static website will be deployed directly to your server and served via an HTTP server such as **Nginx**.
+
+=== Steps for Deployment
+
+1. **Static Site Generation**:
+   - The site will be generated using an SSG like **Hugo**.
+   - After generating the static files, they will be placed in a directory (e.g., `/var/www/your-site`) on your Ubuntu machine.
+   
+2. **Nginx Configuration**:
+   - **Nginx** will be configured as a reverse proxy to serve the static files on port 80. Since you’re managing TLS via Cloudflare, there is no need to configure HTTPS on your server.
+   - Nginx will serve the static files from the directory where the generated website is stored.
+
+3. **File Structure on Ubuntu**:
+   - Static content will be stored in `/var/www/your-site/` (or another directory of your choice).
+   - Nginx will point to this directory as the root for serving files over HTTP.
+
+4. **Build and Deployment Process**:
+   - The Hugo project (or another SSG) will live in a directory on your machine.
+   - After making changes to the content (updating or adding Markdown files), you will run a build command like `hugo` to regenerate the static files.
+   - A simple script can be created to automatically copy the built files into the web server directory, ensuring an easy update process.
+
+5. **Nginx Configuration Example**:
+
+```bash
+server {
+    listen 80;
+    server_name yoursite.com www.yoursite.com;
+
+    root /var/www/your-site;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+```
+
+This Nginx config assumes that:
+
+- Your site files are located in /var/www/your-site
+- Cloudflare is handling SSL/TLS, so Nginx only needs to listen on port 80 for incoming HTTP requests.
+- Cloudflare Setup:
+- Continue using Cloudflare for DNS, TLS, and caching. Ensure that Cloudflare forwards HTTP traffic on port 80 to your Ubuntu machine, which Nginx will handle.
+
+=== Content Management
+
+- All content will still be managed using Markdown files, and any updates to these files will require running the SSG build process to generate the updated site.
+- Optional: You can set up a cron job or a custom deployment script to automatically trigger the build process whenever content is changed, ensuring your site remains up-to-date with minimal manual effort.
+
+== Implementation
+
+=== 1. Install and Set Up the Static Site Generator (Hugo)
+
+1. **Install Hugo** (or your chosen SSG) on your Ubuntu machine:
+   Hugo is simple to install and lightweight. Use the following commands to install it:
+
+   ```bash
+   sudo apt-get update
+   sudo apt-get install hugo
+   ```
+
+2. **Create a new Hugo site**:
+   Choose a directory where you’ll keep your Hugo project (not the one where you’ll serve the static files):
+
+   ```bash
+   hugo new site my-visitor-site
+   cd my-visitor-site
+   ```
+
+3. **Choose a Hugo theme**:
+   Find a simple, clean, and modern theme that fits your vision. You can browse themes at [https://themes.gohugo.io/](https://themes.gohugo.io/). Install it by cloning the theme’s repository into the `themes/` directory.
+
+   Example (using the Ananke theme):
+
+   ```bash
+   git init
+   git submodule add https://github.com/budparr/gohugo-theme-ananke.git themes/ananke
+   echo 'theme = "ananke"' >> config.toml
+   ```
+
+4. **Customize the Hugo config**:
+   Edit the `config.toml` to set up site-specific settings (like site title, baseURL, etc.). 
+
+   ```toml
+   baseURL = "http://yoursite.com/"
+   languageCode = "en-us"
+   title = "Visitor Information for Seoul"
+   theme = "ananke"
+   ```
+
+5. **Create Content**:
+   Add the categories and individual Markdown files as discussed earlier. You can create files for each restaurant, sight, etc., in the `content` directory.
+
+   Example:
+
+   ```bash
+   hugo new sights/gyeongbokgung-palace.md
+   ```
+
+   The file structure will look like this:
+
+   ```bash
+   content/
+     sights/
+       gyeongbokgung-palace.md
+     restaurants/
+       myeongdong-kyoja.md
+   ```
+
+6. **Build the site**:
+   Once you’ve added content, you can generate the static files by running:
+
+   ```bash
+   hugo
+   ```
+
+   The output will be placed in the `public/` directory by default. You will later copy these files to your web server directory.
+
+=== 2. Set Up Nginx to Serve the Site
+
+1. **Install Nginx**:
+
+   If you don't already have Nginx installed, you can install it with:
+
+   ```bash
+   sudo apt-get install nginx
+   ```
+
+2. **Configure Nginx**:
+   After installing, create an Nginx server block to serve the static files from the directory where Hugo will place the generated HTML.
+
+   Edit or create a new configuration file for your site:
+
+   ```bash
+   sudo nano /etc/nginx/sites-available/visitor-site
+   ```
+
+   Add the following configuration (replace `/var/www/your-site` with your desired path):
+
+   ```nginx
+   server {
+       listen 80;
+       server_name yoursite.com www.yoursite.com;
+
+       root /var/www/your-site;
+       index index.html;
+
+       location / {
+           try_files $uri $uri/ =404;
+       }
+   }
+   ```
+
+3. **Enable the site and restart Nginx**:
+   Link the configuration file to the `sites-enabled` directory and restart Nginx:
+
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/visitor-site /etc/nginx/sites-enabled/
+   sudo systemctl restart nginx
+   ```
+
+4. **Verify Nginx**:
+   Ensure that Nginx is serving the content by visiting your domain in the browser. Since Cloudflare handles DNS and TLS, all HTTP requests should be forwarded correctly to your server at port 80.
+
+=== 3. Automate the Build and Deployment Process
+
+1. **Build Script**:
+   Create a simple script to automate the Hugo build process and copy the generated static files to your web server directory:
+
+   ```bash
+   #!/bin/bash
+   # Build the site with Hugo
+   hugo
+
+   # Copy the generated files to the Nginx web root
+   rsync -av --delete public/ /var/www/your-site/
+   ```
+
+   Save this script as `deploy.sh`, make it executable, and run it whenever you need to deploy changes:
+
+   ```bash
+   chmod +x deploy.sh
+   ./deploy.sh
+   ```
+
+2. **Automate with Git** (optional):
+   If you prefer, you can set up a Git repository to store your Hugo project. Then you can automate the deployment using a Git hook. Whenever you push new content, it can trigger the build and deploy process.
+
+   Example steps:
+   - Initialize a Git repo in the project directory and set up a remote origin.
+   - Create a `post-receive` Git hook to run the `deploy.sh` script automatically after every push.
+
+3. **Set Up Cron Job** (optional):
+   If you plan on making updates regularly, you can set up a cron job to rebuild and deploy the site at scheduled intervals (e.g., daily).
+
+   ```bash
+   crontab -e
+   ```
+
+   Add a line like this to rebuild and deploy the site every day at 2 AM:
+
+   ```bash
+   0 2 * * * /path/to/deploy.sh
+   ```

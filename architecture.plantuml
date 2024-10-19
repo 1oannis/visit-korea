@@ -1,0 +1,17 @@
+@startuml architecture
+actor User
+actor Owner as "You"
+node "Static Website" {
+    component "SSG (e.g., Hugo)" as SSG
+    package "Categories" {
+        package "Sights" as Sights
+        package "Restaurants" as Restaurants
+        package "Navigation" as Navigation
+        package "Optional to Visit" as OptionalToVisit
+    }
+}
+
+User --> "Static Website": "Access Site"
+Owner --> SSG: "Writes Content (Markdown)"
+SSG --> "Static Website": "Generates HTML"
+@enduml
